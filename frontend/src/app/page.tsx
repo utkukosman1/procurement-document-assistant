@@ -1,65 +1,72 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import { useState } from "react";
+
+import ChatPanel from "@/components/ChatPanel";
+import DocumentRail from "@/components/DocumentRail";
+import UploadPanel from "@/components/UploadPanel";
+import type { DocumentInfo } from "@/lib/api";
+
+function BrandMark() {
+  return (
+    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white">
+      <svg viewBox="0 0 16 16" className="h-4 w-4" fill="currentColor" aria-hidden>
+        <path d="M8 1.5c.3 2.9 2.6 5.2 5.5 5.5v2c-2.9.3-5.2 2.6-5.5 5.5h-.1C7.6 11.6 5.3 9.3 2.4 9v-2c2.9-.3 5.2-2.6 5.5-5.5H8Z" />
+      </svg>
+    </span>
+  );
+}
 
 export default function Home() {
+  const [document, setDocument] = useState<DocumentInfo | null>(null);
+
+  function handleReset() {
+    setDocument(null);
+  }
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
+    <div className="flex min-h-screen flex-col">
+      <header className="shrink-0 border-b border-zinc-200 bg-white">
+        <div className="mx-auto flex h-16 w-full max-w-[1100px] items-center gap-3 px-6">
+          <BrandMark />
+          <span className="text-sm font-semibold tracking-tight">Procurement Assistant</span>
+          {document && (
+            <button
+              type="button"
+              onClick={handleReset}
+              className="ml-auto rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              New document
+            </button>
+          )}
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+      </header>
+
+      <main className="mx-auto w-full max-w-[1100px] flex-1 px-6 py-10">
+        {document === null ? (
+          <div className="flex min-h-[60vh] flex-col items-center justify-center">
+            <div className="mb-8 max-w-md text-center">
+              <h1 className="text-2xl font-semibold tracking-tight">
+                Analyze a procurement document
+              </h1>
+              <p className="mt-2 text-sm leading-6 text-zinc-500">
+                Upload a PDF to classify it, then ask questions answered from the document itself —
+                every answer cites the pages it came from.
+              </p>
+            </div>
+            <UploadPanel onUploaded={setDocument} />
+          </div>
+        ) : (
+          <div className="flex flex-col gap-6 md:h-[75vh] md:max-h-[860px] md:min-h-[520px] md:flex-row">
+            <DocumentRail document={document} />
+            <ChatPanel
+              key={document.document_id}
+              documentId={document.document_id}
+              filename={document.filename}
+              documentType={document.document_type}
             />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+          </div>
+        )}
       </main>
     </div>
   );
