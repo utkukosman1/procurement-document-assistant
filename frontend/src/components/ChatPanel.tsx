@@ -97,15 +97,15 @@ function extractHeading(snippet: string): string | null {
 // section reference — keeps the raw citations array untouched (still fully
 // available on the message) and only affects what's rendered.
 function dedupeCitationsForDisplay(citations: Citation[]) {
-  const byPage = new Map<number, { citation: Citation; heading: string | null }>();
+  const seen = new Map<string, { citation: Citation; heading: string | null }>();
   for (const citation of citations) {
     const heading = extractHeading(citation.snippet);
-    const existing = byPage.get(citation.page_number);
-    if (!existing || (!existing.heading && heading)) {
-      byPage.set(citation.page_number, { citation, heading });
+    const key = `${citation.page_number}::${heading ?? ""}`;
+    if (!seen.has(key)) {
+      seen.set(key, { citation, heading });
     }
   }
-  return Array.from(byPage.values());
+  return Array.from(seen.values());
 }
 
 function AssistantAvatar() {

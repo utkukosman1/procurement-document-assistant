@@ -9,12 +9,12 @@ router = APIRouter(tags=["documents"])
 
 
 @router.post("/documents", status_code=201)
-async def upload_document(file: UploadFile) -> DocumentResponse:
+def upload_document(file: UploadFile) -> DocumentResponse:
     filename = file.filename or ""
     if not filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=415, detail="Only PDF files are accepted.")
 
-    content = await file.read()
+    content = file.file.read()
     if len(content) > settings.max_upload_bytes:
         raise HTTPException(
             status_code=413,
