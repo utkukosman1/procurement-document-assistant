@@ -74,8 +74,10 @@ const SUMMARY_PROMPT =
 // run before the first real sentence begins — e.g. "7. Integration. This
 // Agreement..." or "PAYMENT TERMS This section...". Match only that leading
 // pattern so we never surface anything that isn't literally in the chunk.
+// The separator after the section number is optional because the backend
+// accepts headings both with and without it ("7." and "2.3" alike).
 const NUMBERED_HEADING_RE =
-  /^(\d+(?:\.\d+)*[.)])\s+([A-Za-z][A-Za-z0-9 ,&()/-]{1,42}?)[.:]\s+[A-Z]/;
+  /^(\d+(?:\.\d+)*[.)]?)\s+([A-Za-z][A-Za-z0-9 ,&()/-]{1,42}?)[.:]\s+[A-Z]/;
 const CAPS_HEADING_RE = /^([A-Z][A-Z0-9 ,&()/-]{3,42})\s+[A-Z][a-z]/;
 
 function extractHeading(snippet: string): string | null {
@@ -293,7 +295,7 @@ export default function ChatPanel({ documentId, filename, documentType }: ChatPa
                     <ul className="mt-2 flex flex-wrap gap-1.5">
                       {dedupeCitationsForDisplay(message.citations).map(({ citation, heading }) => (
                         <li
-                          key={citation.page_number}
+                          key={`${citation.page_number}::${heading ?? ""}`}
                           className="inline-flex items-center gap-1.5 rounded-md bg-zinc-100 px-2 py-1"
                         >
                           <span className="font-mono text-[11px] font-medium text-zinc-500">
