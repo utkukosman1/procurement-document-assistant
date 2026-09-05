@@ -54,3 +54,4 @@ Thumbs.db
 
 # Local AI-assistant instructions (not part of the submission)
 CLAUDE.md
+.claude/
